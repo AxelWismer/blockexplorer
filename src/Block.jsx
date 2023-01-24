@@ -1,50 +1,48 @@
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Collapsible from "react-collapsible";
-import { truncate } from "./utils";
+import { camelCaseToTitle } from "./utils";
 import Container from "react-bootstrap/Container";
+import TextTruncate from "react-text-truncate";
 
-function Block({ block }) {
+// How to make a colum responsive bootstrap?
+function Block({ block, header = {} }) {
   function renderHeader() {
-    return block.number ? (
+    return (
       <Container fluid>
         <Row>
-          <Col>Block: {block.number}</Col>
-          <Col>Miner: {truncate(block.miner)}</Col>
+          {Object.entries(header).map(([key, value]) => {
+            return (
+              <Col sm="12" md="6" lg="6" xl="6">
+                <Row>
+                  <Col sm="3" md="3" lg="3" xl="3">{camelCaseToTitle(key)}:</Col>
+                  <Col sm="9" md="9" lg="9" xl="9">
+                    <TextTruncate text={"" + value} />
+                  </Col>
+                </Row>
+              </Col>
+            );
+          })}
         </Row>
       </Container>
-    ) : block.blockNumber ? (
-      <Container fluid>
-        <Row>
-          <Col>From: {truncate(block.from)}</Col>
-          <Col>To: {truncate(block.to)}</Col>
-        </Row>
-      </Container>
-    ) : (
-      "..."
     );
   }
   function renderBlock() {
     const entries = Object.entries(block);
-    const cols = [];
-    entries.forEach(([key, value]) => {
-      if (key !== "transactions")
-        cols.push(
-          <Col key={key}>
-            {key}: {truncate(value)}
+    return entries.map(([key, value]) => {
+      return (
+        <Row>
+          <Col sm="6" md="4" lg="4" xl="4" key={key}>
+            <p>{camelCaseToTitle(key)}:</p>
           </Col>
-        );
-    });
-    const rows = [];
-    for (let index = 0; index < cols.length; index += 2) {
-      rows.push(
-        <Row>{cols.slice(index, Math.min(index + 2, cols.length))}</Row>
+          <Col sm="6" md="8" lg="4" xl="8" key={key}>
+            <TextTruncate text={"" + value} />
+          </Col>
+        </Row>
       );
-    }
-    return rows;
+    });
   }
   function renderTransactions() {
-    // if (Array.isArray(transactions)) { transactions.map(tx => console.log(tx))};
     return (
       <Collapsible trigger={<h5>Transactions</h5>}>
         {block.transactions.map((tx) => (
@@ -54,11 +52,11 @@ function Block({ block }) {
     );
   }
   return (
-    <Container>
+    <Container className="border block" style={{ padding: 20 }}>
       <Collapsible trigger={renderHeader(block)}>
         <hr />
         <Container fluid>{renderBlock()}</Container>
-        {block.transactions ? <hr/> : null}
+        {block.transactions ? <hr /> : null}
         {block.transactions ? renderTransactions() : null}
       </Collapsible>
     </Container>

@@ -7,12 +7,18 @@ export function formatValue(value) {
       : value
 }
 
-export function formatObject(object) {
+export function formatObject(object, params = { transactions: true }) {
+  const excludeFields = ["accessList", "creates"]
   for (const key in object) {
-    if (key === "transactions") {
-      object[key] = object[key].map(formatObject);
+    if (key.charAt(0) === '_'
+      || (key === "transactions" && !params.transactions)
+      || (excludeFields.includes(key))
+      ) {
+      delete object[key];
     } else {
-      object[key] = formatValue(object[key]);
+      object[key] = key === "transactions"
+        ? object[key].map(formatObject)
+        : formatValue(object[key]);
     }
   }
   return object;
@@ -81,5 +87,9 @@ export function range(start, end, step) {
 
 }
 
+export function camelCaseToTitle(text) {
+  const title = text.replace(/([A-Z])/g, " $1").toLowerCase();
+  return title.charAt(0).toUpperCase() + title.slice(1);
+}
 
 

@@ -6,6 +6,9 @@ import reportWebVitals from './reportWebVitals';
 // Importing the Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { setAppElement } from 'react-modal';
+setAppElement('#root');
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
